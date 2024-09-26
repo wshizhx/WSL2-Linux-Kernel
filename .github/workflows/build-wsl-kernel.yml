@@ -1,0 +1,47 @@
+name: Build WSL Kernel
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y build-essential flex bison dwarves libssl-dev libelf-dev cpio
+
+    - name: Download WSL2 kernel source
+      run: |
+        git clone https://github.com/microsoft/WSL2-Linux-Kernel.git
+
+    - name: Modify kernel configs (optional)
+      run: |
+        cd WSL2-Linux-Kernel
+        make menuconfig KCONFIG_CONFIG=Microsoft/config-wsl
+
+    - name: Build kernel
+      run: |
+        cd WSL2-Linux-Kernel
+        make -j$(nproc) KCONFIG_CONFIG=Microsoft/config-wsl
+
+    - name: Archive the kernel
+      run: |
+        cd WSL2-Linux-Kernel
+        tar -czf wsl2-linux-kernel.tar.gz arch/x86/boot/bzImage
+
+    - name: Upload kernel as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: wsl2-kernel
+        path: WSL2-Linux-Kernel/wsl2-linux-kernel.tar.gz
