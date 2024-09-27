@@ -26,10 +26,11 @@ jobs:
       run: |
         git clone https://github.com/microsoft/WSL2-Linux-Kernel.git
 
-    - name: Modify kernel configs (optional)
+    # Use non-interactive config
+    - name: Apply WSL2 default kernel config
       run: |
         cd WSL2-Linux-Kernel
-        make menuconfig KCONFIG_CONFIG=Microsoft/config-wsl
+        make defconfig KCONFIG_CONFIG=Microsoft/config-wsl
 
     - name: Build kernel
       run: |
@@ -42,7 +43,7 @@ jobs:
         tar -czf wsl2-linux-kernel.tar.gz arch/x86/boot/bzImage
 
     - name: Upload kernel as artifact
-      uses: actions/upload-artifact@v3   # 更新为 v3
+      uses: actions/upload-artifact@v3
       with:
         name: wsl2-kernel
         path: WSL2-Linux-Kernel/wsl2-linux-kernel.tar.gz
