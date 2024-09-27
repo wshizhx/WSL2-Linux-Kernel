@@ -1,13 +1,13 @@
 name: Build WSL Kernel
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
   pull_request:
     branches:
       - main
+  workflow_dispatch:  # 手动触发
 
 jobs:
   build:
@@ -42,7 +42,7 @@ jobs:
         tar -czf wsl2-linux-kernel.tar.gz arch/x86/boot/bzImage
 
     - name: Upload kernel as artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3   # 更新为 v3
       with:
         name: wsl2-kernel
         path: WSL2-Linux-Kernel/wsl2-linux-kernel.tar.gz
